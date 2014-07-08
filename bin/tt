@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+var pkg = require('../package.json');
+var config = require('../lib/config').client;
+var request = require('request');
+var assert = require('assert');
+
+program.version(pkg.version);
+
+program.command('start')
+  .description('start <task>')
+  .action(function(taskName) {
+    
+    assert.ok(taskName, 'You should provide a task name !');
+
+    var params = config.request;
+    params.url = config.endpoint;
+    params.form = {
+      t: taskName,
+      s: new Date().toJSON()
+    };
+
+    request.post(params, function(err, res, body) {
+      if(err) {
+        console.log(err.stack);
+        return process.exit(1);
+      } else {
+        console.log('Task ' + taskName + ' started.');
+      }
+    });
+
+  });
+
+program.command('stop')
+  .description('stop <task>')
+  .action(function(taskName) {
+    
+    assert.ok(taskName, 'You should provide a task name !');
+
+    
+
+  });
+
+program.parse(process.argv);

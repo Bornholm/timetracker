@@ -1,0 +1,58 @@
+#!/usr/bin/env node
+
+var assert = require('assert');
+var config = require('../lib/config').server;
+var express = require('express');
+var app = express();
+var moment = require('moment');
+var Datastore = require('nedb')
+
+var db = new Datastore({ filename: config.data, autoload: true });
+
+// Récupération des jetons autorisés dans la configuration
+var authorizedTokens = config.tokens;
+if(!Array.isArray(authorizedTokens)) {
+  authorizedTokens = authorizedTokens.split(',');
+}
+
+// Validation du jeton
+app.use(function(req, res, next) {
+  var token = req.params.token;
+  // Si le jeton est vide ou n'est pas présent dans la liste
+  // des jetons autorisés, on rejette la requete
+  if(!token || authorizedTokens.indexOf(token) === -1) {
+    res.send('400', 'Invalid token');
+  } else {
+    return next();
+  }
+});
+
+app.post('/tasks/start', function(req, res) {
+
+  var taskName = req.params.t;
+  var start = req.params.s;
+
+  assert.ok(taskName, 'Task should be defined !');
+  assert.ok(moment(start).isValid(), 'Invalid date format !');
+
+  var task = {
+    t: taskName,
+    s: new Date(start).toJSON()
+  };
+  
+});
+
+app.post('/tasks/stop', function(req, res) {
+  var taskName = req.params.taskName;
+  var stop = req.params.stop;
+});
+
+app.get('/tasks/status', function(req, res) {
+  
+});
+
+app.get('/tasks/report', function(req, res) {
+  
+});
+
+app.listen(config.port, config.host);
