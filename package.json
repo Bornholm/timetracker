@@ -6,6 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "tt": "bin/timetracker",
+    "timetracker": "bin/timetracker",
+    "timetracker-server": "bin/timetracker-server"
+  },
   "author": "Bornholm <bornholm@ptitcloud.fr>",
   "license": "GPL",
   "dependencies": {
