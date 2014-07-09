@@ -1,45 +1,37 @@
 #!/usr/bin/env node
 
 var program = require('commander');
+var moment = require('moment');
 var pkg = require('../package.json');
 var config = require('../lib/config').client;
-var request = require('request');
-var assert = require('assert');
+var commands = require('../lib/commands');
 
-program.version(pkg.version);
+program.version(pkg.version)
+  .option('-t --token <value>', 'Set the authorization token', config.token);
 
 program.command('start')
-  .description('start <task>')
-  .action(function(taskName) {
-    
-    assert.ok(taskName, 'You should provide a task name !');
-
-    var params = config.request;
-    params.url = config.endpoint;
-    params.form = {
-      t: taskName,
-      s: new Date().toJSON()
-    };
-
-    request.post(params, function(err, res, body) {
-      if(err) {
-        console.log(err.stack);
-        return process.exit(1);
-      } else {
-        console.log('Task ' + taskName + ' started.');
-      }
-    });
-
-  });
+  .description('Start the given task')
+  .action(commands.start);
 
 program.command('stop')
-  .description('stop <task>')
-  .action(function(taskName) {
-    
-    assert.ok(taskName, 'You should provide a task name !');
+  .description('Stop the given task')
+  .action(commands.stop);
 
-    
+program.command('report')
+  .description('Get the report for all tasks')
+  .action(commands.report);
 
-  });
+program.command('generate')
+  .description('Generate an authorization token for a user (server only)')
+  .action(commands.generate);
+
+program.on('*', function() {
+  console.log('Unknown command. See "%s --help".', program._name);
+});
 
 program.parse(process.argv);
+
+// Affiche l'aide si aucun d'argument
+if(process.argv.length <= 2) {
+  program.outputHelp();
+}
